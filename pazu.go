@@ -2,41 +2,63 @@ package main
 
 import (
 	"fmt"
-	"strings"
-	"text/scanner"
+	"os"
 )
 
 func main() {
-	fmt.Println("hi!")
+	eval("fn")
+	eval("42")
+	eval(`"hey"`)
+	eval("(+ 1 2)")
+	eval("(if foo (+ 1 2) (+ 3 4))")
+	eval("(hey (foo 1 (+ 2 3)) (test test)")
 }
 
-type SyntaxError struct {
-	Msg string
-	Line int
-	Column int
-}
-func (e *SyntaxError) Error() string { 
-	return fmt.Sprintf("%s (line %d, col %d)", e.Msg, e.Line, e.Column)
-}
-
-func Tokenize(sexp string) (tokens []string, err error) {
-	var s scanner.Scanner
-	s.Init(strings.NewReader(sexp))
-	s.Error = func(s *scanner.Scanner, msg string) {
-		err = &SyntaxError{msg, s.Pos().Line, s.Pos().Column}
-	}
-	
-	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		tokens = append(tokens, s.TokenText())
+func eval(s string) {
+	tokens, err := Tokenize(s)
+	if err != nil {
+		fmt.Printf("%s", err)
+		os.Exit(1)
 	}
 
-	return
+	ast, err := Parse(tokens)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+	print(ast)
+
+	// returns something
 }
 
-// type Exp struct {
-// 	Value {}interface
-// }
+func print(ast interface{}) {
+	_print(ast, "\n")
+}
 
-// func Parse() Exp {
-// }
+func _print(ast interface{}, separator string) {
+	switch v := ast.(type) {
+	case List:
+		fmt.Printf("( ")
+		for _, e := range v.Elements {
+			_print(e, " ")
+		}
+		fmt.Printf(")")
+	case Atom:
+		fmt.Printf("%T:%v ", v.Value, v.Value)
+	default:
+		fmt.Printf("?")
+	}
 
+	fmt.Printf(separator)
+}
+
+// TODO: clean it up and add tests
+// TODO: ParseError
+// TODO: add position to ast structs for future error messages
+// TODO: improve printing (Stringer)
+// TODO: repl w/ just read and parse (rppl)
+//
+// TODO: execute
+// TODO: tokenizer should return multiple errors
+// TODO: cons car cdr head tail
+// TODO: quote lists '(a b c)
+// TODO: pattern matching

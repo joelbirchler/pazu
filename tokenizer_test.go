@@ -1,13 +1,13 @@
 package main
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestTokenize(t *testing.T) {
 	var tests = []struct {
-		s string
+		s    string
 		want []string
 	}{
 		{"42", []string{"42"}},
@@ -26,16 +26,16 @@ func TestTokenize(t *testing.T) {
 
 func TestTokenizeErr(t *testing.T) {
 	var tests = []struct {
-		s string
-		msg string
-		line int
+		s      string
+		msg    string
+		line   int
 		column int
 	}{
 		{`(unclosed "quote yo)`, "literal not terminated", 1, 21},
 		{`error on second line
 			"test`, "literal not terminated", 2, 9},
 	}
-	
+
 	for _, test := range tests {
 		_, err := Tokenize(test.s)
 
@@ -48,9 +48,3 @@ func TestTokenizeErr(t *testing.T) {
 		}
 	}
 }
-
-// TODO: parse
-// TODO: repl w/ just read and parse (rppl)
-// TODO: execute
-// TODO: cons car cdr head tail
-// TODO: pattern matching
