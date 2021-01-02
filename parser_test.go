@@ -1,23 +1,77 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"reflect"
+)
 
 func TestParser(t *testing.T) {
 	var tests = []struct {
 		tokens []string
-		ast Exp
+		ast interface{}
 	}{
-		// Need to think about whether []string{"42"} would be wrapped in an expression or not
 		{
 			[]string{"42"},
-			Int{42},
+			Atom{42},
 		},
 		{
 			[]string{"(", "+", "1", "2", ")"}, 
-			Exp{[]interface{
-				Identifier{"+"},
-				Int{1},
-				Int{2},
+			List{
+				Elements: []interface{}{
+					Atom{Symbol("+")},
+					Atom{1},
+					Atom{2},
+				},
+			},
+		},
+		{
+			[]string{"(", "if", "foo", "(", "+", "1", "2", ")", "(", "+", "3", "4", ")", ")"}, 
+			List{
+				Elements: []interface{}{
+					Atom{Symbol("if")},
+					Atom{Symbol("foo")},
+					List{
+						Elements: []interface{}{
+							Atom{Symbol("+")},
+							Atom{1},
+							Atom{2},
+						},
+					},
+					List{
+						Elements: []interface{}{
+							Atom{Symbol("+")},
+							Atom{3},
+							Atom{4},
+						},
+					},
+				},
+			},
+		},
+		{
+			[]string{"(", "hey", "(", "foo", "1", "(", "+", "2", "3", ")", ")", "(", "test", "test", ")", ")"}, 
+			List{
+				Elements: []interface{}{
+					Atom{Symbol("hey")},
+					List{
+						Elements: []interface{}{
+							Atom{Symbol("foo")},
+							Atom{1},
+							List{
+								Elements: []interface{}{
+									Atom{Symbol("+")},
+									Atom{2},
+									Atom{3},
+								},
+							},
+						},
+					},
+					List{
+						Elements: []interface{}{
+							Atom{Symbol("test")},
+							Atom{Symbol("test")},
+						},
+					},
+				},
 			},
 		},
 	}

@@ -2,32 +2,43 @@ package main
 
 import (
 	"fmt"
-	"os"
+
+	"github.com/c-bata/go-prompt"
 )
 
-func main() {
-	eval("fn")
-	eval("42")
-	eval(`"hey"`)
-	eval("(+ 1 2)")
-	eval("(if foo (+ 1 2) (+ 3 4))")
-	eval("(hey (foo 1 (+ 2 3)) (test test)")
+func completer(d prompt.Document) []prompt.Suggest {
+	s := []prompt.Suggest{} // TODO
+	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
 
-func eval(s string) {
+func main() {
+	fmt.Println("Pazu REPL v0.0.1 (Ctrl+D to exit)")
+
+	p := prompt.New(
+		executor,
+		completer,
+		prompt.OptionTitle("Pazu REPL"),
+		prompt.OptionPrefixTextColor(prompt.Cyan),
+		prompt.OptionPrefix("> "),
+	)
+
+	p.Run()
+}
+
+func executor(s string) {
 	tokens, err := Tokenize(s)
 	if err != nil {
-		fmt.Printf("%s", err)
-		os.Exit(1)
+		fmt.Printf("Error: %s\n", err)
+		return
 	}
 
 	ast, err := Parse(tokens)
 	if err != nil {
-		fmt.Printf("Error: %s", err)
+		fmt.Printf("Error: %s\n", err)
+		return
 	}
-	print(ast)
 
-	// returns something
+	print(ast)
 }
 
 func print(ast interface{}) {
@@ -51,14 +62,13 @@ func _print(ast interface{}, separator string) {
 	fmt.Printf(separator)
 }
 
-// TODO: clean it up and add tests
-// TODO: ParseError
+// TODO: ParseError and tests
 // TODO: add position to ast structs for future error messages
 // TODO: improve printing (Stringer)
-// TODO: repl w/ just read and parse (rppl)
+// TODO: organize a bit... main should be a repl that uses the pazu package
 //
 // TODO: execute
 // TODO: tokenizer should return multiple errors
 // TODO: cons car cdr head tail
-// TODO: quote lists '(a b c)
+// TODO: quoted lists '(a b c)
 // TODO: pattern matching

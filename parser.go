@@ -52,7 +52,9 @@ func parseAtom(token string) (interface{}, error) {
 }
 
 func isString(token string) bool {
-	return []rune(token)[0] == '"' // TODO: This could be more robust
+	first := []rune(token)[0]
+	last := []rune(token)[len(token) - 1]
+	return first == '"' && last == '"'
 }
 
 func isInt(token string) bool {
@@ -103,9 +105,9 @@ func parseList(tokens []string) (List, []string, error) {
 		if err != nil {
 			return List{}, []string{}, err
 		}
-		
+
 		li.Elements = append(li.Elements, el)
 	}
 	
-	return li, tokens, nil
+	return li, tokens, fmt.Errorf("parenthesis mismatch")
 }
