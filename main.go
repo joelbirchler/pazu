@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/c-bata/go-prompt"
+	"github.com/joelbirchler/pazu/pkg/pazu"
 )
 
 func completer(d prompt.Document) []prompt.Suggest {
@@ -26,13 +27,13 @@ func main() {
 }
 
 func executor(s string) {
-	tokens, err := Tokenize(s)
+	tokens, err := pazu.Tokenize(s)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
 	}
 
-	ast, err := Parse(tokens)
+	ast, err := pazu.Parse(tokens)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
@@ -47,13 +48,13 @@ func print(ast interface{}) {
 
 func _print(ast interface{}, separator string) {
 	switch v := ast.(type) {
-	case List:
+	case pazu.List:
 		fmt.Printf("( ")
 		for _, e := range v.Elements {
 			_print(e, " ")
 		}
 		fmt.Printf(")")
-	case Atom:
+	case pazu.Atom:
 		fmt.Printf("%T:%v ", v.Value, v.Value)
 	default:
 		fmt.Printf("?")
@@ -64,11 +65,12 @@ func _print(ast interface{}, separator string) {
 
 // TODO: ParseError and tests
 // TODO: add position to ast structs for future error messages
-// TODO: improve printing (Stringer)
-// TODO: organize a bit... main should be a repl that uses the pazu package
 //
 // TODO: execute
+// TODO: printer should return pazulang (pazu fmt = read-parse-print)
 // TODO: tokenizer should return multiple errors
 // TODO: cons car cdr head tail
+// TODO: more lispy tokenizer (+a 1 2) should be ( +a 1 2 ) not ( + a 1 2 )
 // TODO: quoted lists '(a b c)
-// TODO: pattern matching
+// TODO: more number types
+// TODO: language features: pattern matching, channels/actors, gpio, custom types, algebraic data types

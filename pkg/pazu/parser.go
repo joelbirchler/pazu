@@ -1,4 +1,4 @@
-package main
+package pazu
 
 import (
 	"fmt"
@@ -22,12 +22,12 @@ func Parse(tokens []string) (interface{}, error) {
 	if len(tokens) == 0 {
 		return List{}, nil
 	}
-	
+
 	if len(tokens) == 1 {
 		return parseAtom(tokens[0])
 	}
 
-	if tokens[0] == "(" && tokens[len(tokens) - 1] == ")" {
+	if tokens[0] == "(" && tokens[len(tokens)-1] == ")" {
 		ast, remainder, err := parseList(tokens)
 		if len(remainder) != 0 {
 			fmt.Printf("REMAINDER: %v", remainder) // FIXME
@@ -53,7 +53,7 @@ func parseAtom(token string) (interface{}, error) {
 
 func isString(token string) bool {
 	first := []rune(token)[0]
-	last := []rune(token)[len(token) - 1]
+	last := []rune(token)[len(token)-1]
 	return first == '"' && last == '"'
 }
 
@@ -85,13 +85,13 @@ func parseList(tokens []string) (List, []string, error) {
 
 	var (
 		err error
-		el interface{}
+		el  interface{}
 	)
 
 	for len(tokens) > 0 {
 		head := tokens[0]
 		tail := tokens[1:]
-		
+
 		switch head {
 		case "(":
 			el, tokens, err = parseList(tokens)
@@ -100,7 +100,7 @@ func parseList(tokens []string) (List, []string, error) {
 		default:
 			el, err = parseAtom(head)
 			tokens = tail
-		}		
+		}
 
 		if err != nil {
 			return List{}, []string{}, err
@@ -108,6 +108,6 @@ func parseList(tokens []string) (List, []string, error) {
 
 		li.Elements = append(li.Elements, el)
 	}
-	
+
 	return li, tokens, fmt.Errorf("parenthesis mismatch")
 }

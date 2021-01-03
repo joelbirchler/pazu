@@ -1,21 +1,21 @@
-package main
+package pazu
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestParser(t *testing.T) {
 	var tests = []struct {
 		tokens []string
-		ast interface{}
+		ast    interface{}
 	}{
 		{
 			[]string{"42"},
 			Atom{42},
 		},
 		{
-			[]string{"(", "+", "1", "2", ")"}, 
+			[]string{"(", "+", "1", "2", ")"},
 			List{
 				Elements: []interface{}{
 					Atom{Symbol("+")},
@@ -25,7 +25,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			[]string{"(", "if", "foo", "(", "+", "1", "2", ")", "(", "+", "3", "4", ")", ")"}, 
+			[]string{"(", "if", "foo", "(", "+", "1", "2", ")", "(", "+", "3", "4", ")", ")"},
 			List{
 				Elements: []interface{}{
 					Atom{Symbol("if")},
@@ -48,7 +48,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			[]string{"(", "hey", "(", "foo", "1", "(", "+", "2", "3", ")", ")", "(", "test", "test", ")", ")"}, 
+			[]string{"(", "hey", "(", "foo", "1", "(", "+", "2", "3", ")", ")", "(", "test", "test", ")", ")"},
 			List{
 				Elements: []interface{}{
 					Atom{Symbol("hey")},
